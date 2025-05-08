@@ -11,6 +11,10 @@ def NormalSNV(Spectra):
 
 def outlier_detection_multiple_datasets(data, PCA_components, contamination, random_state):
     # This function performs outlier detection automatically on multiple Raman spectral datasets using PCA and Isolation Forests.
+    # data: Dictionary of pandas DataFrames, where each key is a dataset.
+    # PCA_components(type: int): Number of principal components to retain. For practicality, this should be set to 2.
+    # contamination (type: float): Estimated proportion of outliers in the data (i.e., from 0 to 1)
+    # random_state (type: int): Random seed for reproducibility. Typically set to 42.
 
     fig = make_subplots(rows = len(data), cols = 1, subplot_titles = list(data.keys()))
 
@@ -18,15 +22,15 @@ def outlier_detection_multiple_datasets(data, PCA_components, contamination, ran
     for key in data.keys():
         df = data[key]
 
-        # Exclude the last two columns
-        columns_to_select = df.columns[:-2]
-        Spectra = df[columns_to_select]
+        # Exclude the last two columns (if they are not spectral data; comment out if not needed)
+        columns_to_select = df.columns[:-2] 
+        df = df[columns_to_select]
 
         # Ensure the columns are numeric
-        Spectra = Spectra.apply(pd.to_numeric, errors='coerce').dropna()
+        df = df.apply(pd.to_numeric, errors='coerce').dropna()
 
         # Apply SNV
-        X = NormalSNV(Spectra)
+        X = NormalSNV(df)
 
         # Standardise data
         X_mean = X.mean()
